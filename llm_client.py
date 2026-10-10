@@ -16,8 +16,8 @@ class GenerationCancelled(Exception):
 
 
 class OllamaStreamError(RuntimeError):
+    pass
    
-
 
 def generate_stream(
     endpoint: str,
