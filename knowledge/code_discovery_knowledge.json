@@ -1,0 +1,104 @@
+{
+  "metadata": {
+    "name": "HP2NET code-discovery target knowledge",
+    "purpose": "Describe supported tools and interfaces without declaring workflows as implemented.",
+    "implementation_source": "parsl_workflow.py",
+    "implementation_detection": "source_code_ast",
+    "policy": "Before generating code, inspect parsl_workflow.py and compare its apps.* call sequence with the requested workflow implementation pattern."
+  },
+  "tools": {
+    "RAxML": {
+      "type": "gene_tree_inference",
+      "description": "Maximum likelihood phylogenetic tree inference"
+    },
+    "IQ-TREE": {
+      "type": "gene_tree_inference",
+      "description": "Maximum likelihood phylogenetic tree inference"
+    },
+    "ASTRAL": {
+      "type": "species_tree_inference",
+      "description": "Species tree inference from gene trees"
+    },
+    "BUCKy": {
+      "type": "gene_tree_concordance",
+      "description": "Bayesian concordance analysis of gene trees"
+    },
+    "Quartet MaxCut": {
+      "type": "quartet_topology",
+      "description": "Constructs species trees and quartet topologies from concordance factors"
+    },
+    "SNaQ": {
+      "type": "network_inference",
+      "description": "Infers phylogenetic networks using maximum pseudo-likelihood"
+    },
+    "MrBayes": {
+      "type": "gene_tree_inference",
+      "description": "Bayesian inference of phylogeny"
+    },
+    "MBSUM": {
+      "type": "utility",
+      "description": "Summarizes tree samples from MrBayes"
+    },
+    "PhyloNet": {
+      "type": "network_inference",
+      "description": "Infers phylogenetic networks"
+    },
+    "root_tree": {
+      "type": "utility",
+      "description": "Roots phylogenetic trees"
+    }
+  },
+  "interfaces": [
+    {
+      "producer": "RAxML",
+      "consumer": "ASTRAL",
+      "supported": true
+    },
+    {
+      "producer": "IQ-TREE",
+      "consumer": "ASTRAL",
+      "supported": true
+    },
+    {
+      "producer": "ASTRAL",
+      "consumer": "SNaQ",
+      "supported": true
+    },
+    {
+      "producer": "BUCKy",
+      "consumer": "Quartet MaxCut",
+      "supported": true
+    },
+    {
+      "producer": "Quartet MaxCut",
+      "consumer": "SNaQ",
+      "supported": true
+    },
+    {
+      "producer": "MrBayes",
+      "consumer": "MBSUM",
+      "supported": true
+    },
+    {
+      "producer": "MBSUM",
+      "consumer": "BUCKy",
+      "supported": true
+    },
+    {
+      "producer": "RAxML",
+      "consumer": "root_tree",
+      "supported": true
+    },
+    {
+      "producer": "IQ-TREE",
+      "consumer": "root_tree",
+      "supported": true
+    },
+    {
+      "producer": "root_tree",
+      "consumer": "PhyloNet",
+      "supported": true
+    }
+  ],
+  "workflows": {}
+}

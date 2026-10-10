@@ -8,9 +8,10 @@ import ast
 import json
 import os
 import re
-import requests
 import warnings
 from collections import deque
+
+from llm_client import GenerationCancelled, generate_stream
 
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
@@ -18,7 +19,8 @@ OLLAMA_API_ENDPOINT = "http://127.0.0.1:11434/api/generate"
 MODEL_NAME = "llama3.1:8b"
 
 ORIGINAL_KB_PATH = "knowledge/hp2net_knowledge.json"
-TEST_KB_PATH = "knowledge/test_knowledge.json"
+TEST_KB_PATH = "knowledge/code_discovery_knowledge.json"
+WORKFLOW_SOURCE_PATH = "parsl_workflow.py"
 
 IMPLEMENTATION_SPEC = {
     "framework": "Parsl",
@@ -368,6 +370,53 @@ def resolve_implementation_pattern(steps):
     tuple_steps = tuple(steps)
     return IMPLEMENTATION_PATTERNS.get(tuple_steps)
 
+def tool_to_app_name(tool_name):
+    """Convert a canonical knowledge-base tool name to its apps.py symbol."""
+    return tool_name.lower().replace(" ", "_").replace("-", "")
+
+def discover_implemented_workflow(steps, knowledge, workflow_file=WORKFLOW_SOURCE_PATH):
+   
+    if not os.path.exists(workflow_file):
+        return None
+    try:
+        with open(workflow_file, "r", encoding="utf-8") as file_stream:
+            workflow_tree = ast.parse(file_stream.read(), filename=workflow_file)
+    except (OSError, SyntaxError):
+        return None
+
+    app_to_tool = {
+        tool_to_app_name(tool_name): tool_name
+        for tool_name in knowledge.get("tools", {})
+    }
+    requested_steps = list(steps)
+
+    for function in workflow_tree.body:
+        if not isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        app_calls = []
+        for node in ast.walk(function):
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "apps"
+            ):
+                app_calls.append((getattr(node, "lineno", 0), node.func.attr))
+        app_sequence = [name for _, name in sorted(app_calls)]
+        scientific_steps = [
+            app_to_tool[app_name]
+            for app_name in app_sequence
+            if app_name in app_to_tool
+        ]
+        if scientific_steps == requested_steps:
+            return {
+                "function_name": function.name,
+                "steps": scientific_steps,
+                "apps": app_sequence,
+                "source": workflow_file
+            }
+    return None
+
 def validate_endpoints(steps, requested_tools):
     """Validate preservation of the requested workflow endpoints (starting and ending tools).
     Input:
@@ -663,10 +712,14 @@ def run_agent1_planner(user_prompt, original_knowledge, requested_tools):
         }
     }
     try:
-        response = requests.post(OLLAMA_API_ENDPOINT, json=payload, timeout=300)
-        response.raise_for_status()
-        raw_text = response.json().get("response", "").strip()
+        raw_text = generate_stream(
+            OLLAMA_API_ENDPOINT,
+            payload,
+            label="Agent 1"
+        ).strip()
         return json.loads(raw_text)
+    except GenerationCancelled:
+        raise
     except Exception as e:
         print(f"[AGENT 1 ERROR] Communication or parsing failure: {e}")
         return {"goal": "", "steps": []}
@@ -747,10 +800,14 @@ def raxml_astral(basedir, config, prepare_to_run):
         }
     }
     try:
-        response = requests.post(OLLAMA_API_ENDPOINT, json=payload, timeout=300)
-        response.raise_for_status()
-        raw_content = response.json().get("response", "").strip()
+        raw_content = generate_stream(
+            OLLAMA_API_ENDPOINT,
+            payload,
+            label="Agent 2"
+        ).strip()
         return extract_python_code(raw_content)
+    except GenerationCancelled:
+        raise
     except Exception as e:
         return f"# AGENT 2 ERROR: Failed to generate Python code: {e}"
 
@@ -779,6 +836,19 @@ def main():
     print(f"      -> Proposed steps: {proposed_steps}\n")
     if not proposed_steps:
         print("[ERROR] Agent 1 did not generate a valid step sequence.")
+        return
+
+    known_tools = set(original_knowledge.get("tools", {})) | set(test_knowledge.get("tools", {}))
+    unknown_proposed_tools = [
+        tool for tool in proposed_steps
+        if tool not in known_tools
+    ]
+    if unknown_proposed_tools:
+        print(
+            "[REJECTED BY PYTHON VALIDATOR] Unknown tool(s) proposed: "
+            + ", ".join(unknown_proposed_tools)
+        )
+        print("[3/3] Agent 2 skipped.")
         return
 
     graph_resolved_steps = resolve_workflow_path(
@@ -818,6 +888,22 @@ def main():
         print("[3/3] Agent 2 skipped.")
         print("      -> Composition is not supported by the target KB graph.")
         return
+
+    discovered_workflow = discover_implemented_workflow(
+        proposed_steps,
+        test_knowledge
+    )
+    if discovered_workflow:
+        print(
+            "[2.5/3] Existing implementation discovered in "
+            f"{discovered_workflow['source']}: {discovered_workflow['function_name']}"
+        )
+        print(f"      -> Scientific steps: {discovered_workflow['steps']}")
+        print(f"      -> apps.* calls: {discovered_workflow['apps']}\n")
+        print("[3/3] Agent 2 skipped.")
+        print("      -> The requested workflow already exists in the source code.")
+        return
+
     pattern = resolve_implementation_pattern(proposed_steps)
     if pattern:
         print(f"[2.5/3] Resolved HP2Net implementation pattern: {pattern['apps']}\n")
@@ -844,4 +930,9 @@ def main():
     print("======================================================================")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except GenerationCancelled:
+        print("Execução encerrada sem gerar ou alterar arquivos.")
+    except KeyboardInterrupt:
+        print("\nSolicitação cancelada pelo usuário.")
