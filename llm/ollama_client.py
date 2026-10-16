@@ -17,7 +17,10 @@ class GenerationCancelled(Exception):
 
 class OllamaStreamError(RuntimeError):
     pass
+<<<<<<< HEAD:llm_client.py
    
+=======
+>>>>>>> 794c282 (Refactor phylogenetic agents into modular structure):llm/ollama_client.py
 
 def generate_stream(
     endpoint: str,

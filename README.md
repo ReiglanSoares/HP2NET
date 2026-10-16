@@ -9,11 +9,20 @@ This fork extends HP2NET with a preliminary LLM-driven system for semantic workf
 
 * **`phylo_agent.py`**: Agent 1, the Semantic Planner. Translates natural-language requests into canonical HP2NET tool sequences, including required intermediate steps such as `ASTRAL` between `RAxML` and `SNaQ`.
 
-* **`phylo_agent2.py`**: Agent 2, the Parsl Code Generator and Validator. Performs deterministic graph resolution, target knowledge-base validation, implementation-pattern selection, Parsl code generation, and static AST validation.
+* **`phylo_agent2.py`**: Command-line orchestrator for planning, validation, workflow discovery, and code generation.
 
 * **`knowledge/hp2net_knowledge.json`**: Original HP2NET knowledge base used by Agent 1. Describes available tools, interfaces, workflow rules, and existing workflows.
 
-* **`knowledge/test_knowledge.json`**: Target knowledge base used for deterministic validation. Distinguishes between implemented workflows, supported-but-unimplemented compositions, and unsupported compositions.
+* **`knowledge/code_discovery_knowledge.json`**: Target knowledge base used for graph validation while implemented workflows are discovered directly from `parsl_workflow.py`.
+
+### Agent Code Organization
+
+```text
+agents/            Agent 1 planner and Agent 2 code generator
+workflow_engine/   Knowledge, graph, discovery, patterns, validation, and output handling
+llm/               Ollama streaming, metrics, and cancellation
+phylo_agent2.py    Command-line orchestrator
+```
 
 ### How to Run
 
@@ -23,6 +32,20 @@ Run the complete planning, validation, and code-generation pipeline from the pro
 
 ```bash
 python3 phylo_agent2.py
+```
+
+By default, validated generated code and its metadata are saved in `generated_workflows/`.
+
+Show the available command-line options:
+
+```bash
+python3 phylo_agent2.py --help
+```
+
+Use `--print-code` to display the validated generated code in the terminal without saving code or metadata files:
+
+```bash
+python3 phylo_agent2.py --print-code
 ```
 
 ### Current Validation Status
