@@ -21,6 +21,9 @@ This fork extends HP2NET with a preliminary LLM-driven system for semantic workf
 agents/            Agent 1 planner and Agent 2 code generator
 workflow_engine/   Knowledge, graph, discovery, patterns, validation, and output handling
 llm/               Ollama streaming, metrics, and cancellation
+generated_workflows/  Standalone generated workflow functions and metadata
+previews/           Named cumulative workflow integration environments
+trash/              Recoverable removed previews and generated workflows
 phylo_agent2.py    Command-line orchestrator
 ```
 
@@ -48,9 +51,86 @@ Use `--print-code` to display the validated generated code in the terminal witho
 python3 phylo_agent2.py --print-code
 ```
 
+Use `--new-preview` to create a named integration preview from `parsl_workflow.py`. The original workflow is not modified:
+
+```bash
+python3 phylo_agent2.py --new-preview experiment_1
+```
+
+Use `--preview` on later requests to add validated functions to the same workflow copy. The cumulative workflow, metadata history, and diff are kept under `previews/experiment_1/`:
+
+```bash
+python3 phylo_agent2.py --preview experiment_1
+```
+
+Before generating code, the selected preview is inspected. If the requested workflow is already present in that preview, Agent 2 is skipped.
+
+Optionally, create a new preview from another workflow file:
+
+```bash
+python3 phylo_agent2.py --new-preview experiment_2 --preview-source workflows/parsl_workflow_2.py
+```
+
+An existing generated workflow can also be revalidated and added to a new or existing preview without calling the LLM again:
+
+```bash
+python3 phylo_agent2.py --preview experiment_1 --integrate-generated generated_workflows/raxml_astral.py
+```
+
+### Artifact Management
+
+Artifact commands manage previews and generated workflows without calling the LLM. List all active artifacts:
+
+```bash
+python3 phylo_agent2.py artifacts list
+```
+
+List only one artifact category or show the artifact-specific help:
+
+```bash
+python3 phylo_agent2.py artifacts list preview
+python3 phylo_agent2.py artifacts list generated
+python3 phylo_agent2.py artifacts --help
+```
+
+Rename an artifact:
+
+```bash
+python3 phylo_agent2.py artifacts rename preview experiment_1 final_experiment
+python3 phylo_agent2.py artifacts rename generated raxml_astral raxml_astral_test
+```
+
+Validate and accept manual changes made directly to a preview workflow. This updates its hash, cumulative diff, and metadata history without calling the LLM:
+
+```bash
+python3 phylo_agent2.py artifacts sync preview experiment_1
+```
+
+Move an artifact to the recoverable `trash/` directory:
+
+```bash
+python3 phylo_agent2.py artifacts remove preview final_experiment
+python3 phylo_agent2.py artifacts remove generated raxml_astral_test
+```
+
+Removal asks for the artifact name as confirmation. Use `--yes` only when non-interactive confirmation is intentionally required:
+
+```bash
+python3 phylo_agent2.py artifacts remove preview final_experiment --yes
+```
+
+Restore the most recently removed artifact with the specified name:
+
+```bash
+python3 phylo_agent2.py artifacts restore preview final_experiment
+python3 phylo_agent2.py artifacts restore generated raxml_astral_test
+```
+
+Renaming a generated workflow moves its `.py` and metadata `.json` together, but does not rename the Python function inside the generated code. Removed artifacts remain recoverable under `trash/`.
+
 ### Current Validation Status
 
-Validation currently checks Python AST validity, required HP2NET applications, absence of unauthorized applications, application signatures, implementation patterns, and workflow structure.
+Validation currently checks Python AST validity, required HP2NET applications, absence of unauthorized applications, application signatures, implementation patterns, workflow structure, duplicate function names, duplicate `apps.*` sequences, and equivalent function bodies.
 
 #### Existing Workflows — Code Generation Skipped
 - RAxML → ASTRAL → SNaQ

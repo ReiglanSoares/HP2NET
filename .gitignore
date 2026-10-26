@@ -155,3 +155,11 @@ peptideos
 
 apps
 example_data/*
+
+# Agent-generated local artifacts
+generated_workflows/*.py
+generated_workflows/metadata/*.json
+previews/*
+!previews/.gitkeep
+trash/*
+!trash/.gitkeep
