@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "bucky",
+  "display_name": "BUCKy",
+  "version_scope": "1.4.4",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["bucky_v1_4_4_manual", "bucky_official_repository", "bucky_primary_article"],
+  "capabilities": [{"id": "bayesian_concordance_analysis", "description": "Estimates concordance factors and concordance trees from locus-level posterior tree summaries."}],
+  "input_contracts": [{"artifact": "bucky_locus_summaries", "file_pattern": "*.sum"}, {"artifact": "taxon_prune_selection", "required": false}],
+  "output_contracts": [{"artifact": "concordance_analysis_report", "file_pattern": "*.out"}, {"artifact": "concordance_tree", "file_pattern": "*.concordance"}],
+  "cli_contract": {"executable_family": ["bucky"], "analysis_parameters": ["alpha", "number of MCMC updates", "output prefix", "prune file"]},
+  "limitations": ["This initial extraction does not yet cover every BUCKy analysis option and diagnostic output.", "Human review is required before promotion."]
+}

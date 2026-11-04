@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "mrbayes",
+  "display_name": "MrBayes",
+  "version_scope": "3.2.x",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["mrbayes_v3_2_manual", "mrbayes_official_repository", "mrbayes_primary_article"],
+  "capabilities": [{"id": "bayesian_phylogenetic_inference", "description": "Samples phylogenetic trees and model parameters using Bayesian MCMC."}],
+  "input_contracts": [{"artifact": "nexus_alignment_and_commands", "format": "NEXUS with a MrBayes command block"}],
+  "output_contracts": [{"artifact": "posterior_tree_samples", "file_pattern": "*.t", "format": "NEXUS tree samples"}, {"artifact": "parameter_samples", "file_pattern": "*.p"}],
+  "cli_contract": {"executable_family": ["mb", "mrbayes"], "execution_model": "execute a NEXUS command file"},
+  "limitations": ["Burn-in, convergence and model settings are scientific choices and cannot be inferred from file type alone.", "This initial extraction does not yet cover every model, command and analysis supported by MrBayes.", "Human review is required before promotion."]
+}

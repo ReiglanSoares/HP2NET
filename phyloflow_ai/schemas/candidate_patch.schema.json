@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phyloflow.ai/schemas/candidate-patch-v1.json",
+  "title": "PhyloFlowAI candidate knowledge patch",
+  "type": "object",
+  "required": ["schema_version", "adapter", "target_file", "base_sha256", "operations", "duplicate_candidates", "blocked_candidates", "review_status"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "adapter": {"type": "string"},
+    "target_file": {"type": "string"},
+    "base_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "operations": {"type": "array"},
+    "duplicate_candidates": {"type": "array"},
+    "blocked_candidates": {"type": "array"},
+    "review_status": {"const": "awaiting_human_review"}
+  }
+}

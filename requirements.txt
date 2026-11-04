@@ -2,3 +2,6 @@ pandas
 biopython
 parsl
 parsl[monitoring]
+requests
+pypdf
+fonttools

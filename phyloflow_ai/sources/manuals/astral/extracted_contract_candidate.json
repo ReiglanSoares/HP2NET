@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "astral",
+  "display_name": "ASTRAL",
+  "version_scope": "5.x",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["astral_official_tutorial", "astral_official_repository", "astral_primary_article"],
+  "capabilities": [{"id": "species_tree_inference", "description": "Estimates a species tree from a collection of gene trees under the multispecies coalescent."}],
+  "input_contracts": [{"artifact": "gene_tree_collection", "format": "Newick trees, normally one tree per line", "cli_option": "-i"}],
+  "output_contracts": [{"artifact": "species_tree", "format": "Newick", "cli_option": "-o"}],
+  "cli_contract": {"executable_family": ["java -jar astral*.jar"], "documented_core_options": {"-i": "input gene trees", "-o": "output species tree"}},
+  "limitations": ["Gene-tree preprocessing, taxon mapping and optional analysis modes must be represented explicitly before operational use.", "This initial extraction does not yet cover every option in the official tutorial.", "Human review is required before promotion."]
+}

@@ -1,157 +1,22 @@
 # High Performance Phylogenetic Network (HP2NET) framework
 ### Framework for construction of phylogenetic networks on High Performance Computing (HPC) environment
 
-## This fork: LLM-based workflow planning and generation
+## PhyloFlowAI integration
 
-This fork extends HP2NET with a preliminary LLM-driven system for semantic workflow planning and Parsl code generation. It translates natural-language requests into validated HP2NET workflow pipelines while preventing the LLM from inventing unsupported scientific compositions, tools, or external APIs.
+This fork includes **PhyloFlowAI**, an independent tool for natural-language workflow
+planning, deterministic validation, scientific-source ingestion, code generation, and
+safe integration previews. HP2NET support is provided through a dedicated adapter.
 
-### New files
+See the complete [PhyloFlowAI documentation](phyloflow_ai/README.md) for installation,
+commands, architecture, sources, suggestions, previews, schemas, and limitations.
 
-* **`phylo_agent.py`**: Agent 1, the Semantic Planner. Translates natural-language requests into canonical HP2NET tool sequences, including required intermediate steps such as `ASTRAL` between `RAxML` and `SNaQ`.
-
-* **`phylo_agent2.py`**: Command-line orchestrator for planning, validation, workflow discovery, and code generation.
-
-* **`knowledge/hp2net_knowledge.json`**: Original HP2NET knowledge base used by Agent 1. Describes available tools, interfaces, workflow rules, and existing workflows.
-
-* **`knowledge/code_discovery_knowledge.json`**: Target knowledge base used for graph validation while implemented workflows are discovered directly from `parsl_workflow.py`.
-
-### Agent Code Organization
-
-```text
-agents/            Agent 1 planner and Agent 2 code generator
-workflow_engine/   Knowledge, graph, discovery, patterns, validation, and output handling
-llm/               Ollama streaming, metrics, and cancellation
-generated_workflows/  Standalone generated workflow functions and metadata
-previews/           Named cumulative workflow integration environments
-trash/              Recoverable removed previews and generated workflows
-phylo_agent2.py    Command-line orchestrator
-```
-
-### How to Run
-
-Both agents require a local [Ollama](https://ollama.com/) instance running the `llama3.1:8b` model.
-
-Run the complete planning, validation, and code-generation pipeline from the project root:
-
-```bash
-python3 phylo_agent2.py
-```
-
-By default, validated generated code and its metadata are saved in `generated_workflows/`.
-
-Show the available command-line options:
+Quick start from the repository root:
 
 ```bash
 python3 phylo_agent2.py --help
+python3 phylo_agent2.py adapter validate hp2net
+python3 phylo_agent2.py
 ```
-
-Use `--print-code` to display the validated generated code in the terminal without saving code or metadata files:
-
-```bash
-python3 phylo_agent2.py --print-code
-```
-
-Use `--new-preview` to create a named integration preview from `parsl_workflow.py`. The original workflow is not modified:
-
-```bash
-python3 phylo_agent2.py --new-preview experiment_1
-```
-
-Use `--preview` on later requests to add validated functions to the same workflow copy. The cumulative workflow, metadata history, and diff are kept under `previews/experiment_1/`:
-
-```bash
-python3 phylo_agent2.py --preview experiment_1
-```
-
-Before generating code, the selected preview is inspected. If the requested workflow is already present in that preview, Agent 2 is skipped.
-
-Optionally, create a new preview from another workflow file:
-
-```bash
-python3 phylo_agent2.py --new-preview experiment_2 --preview-source workflows/parsl_workflow_2.py
-```
-
-An existing generated workflow can also be revalidated and added to a new or existing preview without calling the LLM again:
-
-```bash
-python3 phylo_agent2.py --preview experiment_1 --integrate-generated generated_workflows/raxml_astral.py
-```
-
-### Artifact Management
-
-Artifact commands manage previews and generated workflows without calling the LLM. List all active artifacts:
-
-```bash
-python3 phylo_agent2.py artifacts list
-```
-
-List only one artifact category or show the artifact-specific help:
-
-```bash
-python3 phylo_agent2.py artifacts list preview
-python3 phylo_agent2.py artifacts list generated
-python3 phylo_agent2.py artifacts --help
-```
-
-Rename an artifact:
-
-```bash
-python3 phylo_agent2.py artifacts rename preview experiment_1 final_experiment
-python3 phylo_agent2.py artifacts rename generated raxml_astral raxml_astral_test
-```
-
-Validate and accept manual changes made directly to a preview workflow. This updates its hash, cumulative diff, and metadata history without calling the LLM:
-
-```bash
-python3 phylo_agent2.py artifacts sync preview experiment_1
-```
-
-Move an artifact to the recoverable `trash/` directory:
-
-```bash
-python3 phylo_agent2.py artifacts remove preview final_experiment
-python3 phylo_agent2.py artifacts remove generated raxml_astral_test
-```
-
-Removal asks for the artifact name as confirmation. Use `--yes` only when non-interactive confirmation is intentionally required:
-
-```bash
-python3 phylo_agent2.py artifacts remove preview final_experiment --yes
-```
-
-Restore the most recently removed artifact with the specified name:
-
-```bash
-python3 phylo_agent2.py artifacts restore preview final_experiment
-python3 phylo_agent2.py artifacts restore generated raxml_astral_test
-```
-
-Renaming a generated workflow moves its `.py` and metadata `.json` together, but does not rename the Python function inside the generated code. Removed artifacts remain recoverable under `trash/`.
-
-### Current Validation Status
-
-Validation currently checks Python AST validity, required HP2NET applications, absence of unauthorized applications, application signatures, implementation patterns, workflow structure, duplicate function names, duplicate `apps.*` sequences, and equivalent function bodies.
-
-#### Existing Workflows — Code Generation Skipped
-- RAxML → ASTRAL → SNaQ
-- RAxML → root_tree → PhyloNet
-- IQ-TREE → ASTRAL → SNaQ
-- IQ-TREE → root_tree → PhyloNet
-- MrBayes → MBSUM → BUCKy → Quartet MaxCut → SNaQ
-
-#### New Supported Compositions
-- RAxML → ASTRAL
-- BUCKy → Quartet MaxCut → SNaQ
-
-#### Unsupported Compositions — Deterministically Rejected
-- MrBayes → PhyloNet
-
-This composition is rejected because no valid interface path exists in the target workflow graph.
-
-### Limitations
-- Static validation only: Generated functions pass structural, AST, application-signature, and implementation-pattern checks, but have not yet been executed within the live HP2NET/Parsl runtime.
-- Manual knowledge-base maintenance: Tool interfaces, graph dependencies, supported compositions, and implementation patterns are explicitly declared in knowledge/.
-- Preliminary implementation: The current system performs workflow planning, validation, and Parsl code generation. Runtime execution of newly generated workflows on HP2NET/HPC is the next development stage.
 
 ## Introduction
 

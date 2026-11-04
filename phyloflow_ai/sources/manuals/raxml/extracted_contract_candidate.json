@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "tool_id": "raxml",
+  "display_name": "RAxML",
+  "software_family": "standard-RAxML",
+  "version_scope": "8.2.x",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": [
+    "raxml_v8_2x_official_manual",
+    "raxml_standard_official_repository",
+    "raxml_v8_primary_article"
+  ],
+  "capabilities": [
+    {
+      "id": "maximum_likelihood_tree_inference",
+      "description": "Maximum-likelihood inference of phylogenetic trees from sequence alignments.",
+      "evidence": [
+        {
+          "source_id": "raxml_v8_primary_article",
+          "locator": "Abstract and Introduction"
+        },
+        {
+          "source_id": "raxml_v8_2x_official_manual",
+          "locator": "Section I - About RAxML"
+        }
+      ]
+    },
+    {
+      "id": "rapid_bootstrap_and_best_tree_search",
+      "description": "Option -f a performs rapid bootstrap analysis and a search for the best-scoring maximum-likelihood tree in one run.",
+      "evidence": [
+        {
+          "source_id": "raxml_v8_2x_official_manual",
+          "locator": "Section VIII, option -f a"
+        }
+      ]
+    }
+  ],
+  "input_contracts": [
+    {
+      "artifact": "sequence_alignment",
+      "formats": ["relaxed PHYLIP", "FASTA"],
+      "cli_option": "-s",
+      "evidence": [
+        {
+          "source_id": "raxml_v8_2x_official_manual",
+          "locator": "Section VII - Alignment input File Formats; option -s"
+        }
+      ]
+    }
+  ],
+  "output_contracts": [
+    {
+      "artifact": "best_scoring_ml_tree",
+      "file_pattern": "RAxML_bestTree.<run_id>",
+      "format": "phylogenetic tree",
+      "evidence": [
+        {
+          "source_id": "raxml_v8_2x_official_manual",
+          "locator": "Section IX - Output Files"
+        }
+      ]
+    },
+    {
+      "artifact": "bootstrap_tree_collection",
+      "file_pattern": "RAxML_bootstrap.<run_id>",
+      "format": "collection of bootstrap trees",
+      "evidence": [
+        {
+          "source_id": "raxml_v8_2x_official_manual",
+          "locator": "Section IX - Output Files"
+        }
+      ]
+    },
+    {
+      "artifact": "best_tree_with_bootstrap_support",
+      "file_patterns": [
+        "RAxML_bipartitions.<run_id>",
+        "RAxML_bipartitionsBranchLabels.<run_id>"
+      ],
+      "format": "phylogenetic tree with bootstrap support",
+      "evidence": [
+        {
+          "source_id": "raxml_v8_2x_official_manual",
+          "locator": "Section IX - Output Files"
+        }
+      ]
+    }
+  ],
+  "cli_contract": {
+    "executable_family": [
+      "raxmlHPC",
+      "raxmlHPC-PTHREADS",
+      "raxmlHPC-MPI",
+      "raxmlHPC-HYBRID"
+    ],
+    "options": {
+      "-s": "alignment input file",
+      "-n": "run identifier appended to output files",
+      "-m": "substitution model",
+      "-f a": "rapid bootstrap plus best-scoring ML tree search",
+      "-p": "random seed used for parsimony starting trees",
+      "-x": "rapid bootstrap random seed",
+      "-N": "number of alternative runs or bootstrap replicates in the relevant mode",
+      "-T": "number of threads for PThreads executables"
+    },
+    "evidence": [
+      {
+        "source_id": "raxml_v8_2x_official_manual",
+        "locator": "Section VIII - The RAxML options"
+      }
+    ]
+  },
+  "limitations": [
+    "This candidate describes standard-RAxML 8.2.x and must not be applied automatically to RAxML-NG.",
+    "The candidate is an initial structured extraction and does not yet represent every analysis mode documented by RAxML.",
+    "Promotion into operational knowledge requires deterministic validation and human scientific review."
+  ]
+}
+

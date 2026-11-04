@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "snaq",
+  "display_name": "SNaQ",
+  "version_scope": "current SNaQ.jl; historical PhyloNetworks API tracked separately",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["snaq_official_readme", "snaq_official_documentation", "snaq_official_repository", "snaq_primary_article"],
+  "capabilities": [{"id": "maximum_pseudolikelihood_network_inference", "description": "Infers a level-1 phylogenetic network from quartet concordance factors and a starting tree."}],
+  "input_contracts": [{"artifact": "quartet_concordance_factors", "format": "quartet CF table"}, {"artifact": "starting_species_tree", "format": "Newick or parsed tree object"}, {"artifact": "maximum_hybridizations", "parameter": "hmax"}],
+  "output_contracts": [{"artifact": "phylogenetic_network", "format": "extended Newick or Julia network representation"}, {"artifact": "optimization_run_files", "required": false}],
+  "api_contract": {"historical_function": "snaq!", "current_package": "SNaQ.jl", "key_parameters": ["starting tree", "concordance factors", "hmax", "runs", "output prefix"]},
+  "limitations": ["Current SNaQ.jl documentation must not be treated as identical to the historical PhyloNetworks API.", "Exact concordance-factor schemas and rooting requirements require version-specific review.", "This initial extraction does not yet cover every optimization, topology and analysis option.", "Human review is required before promotion."]
+}

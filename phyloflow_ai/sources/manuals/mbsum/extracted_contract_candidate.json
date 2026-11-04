@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "mbsum",
+  "display_name": "MBSUM",
+  "version_scope": "BUCKy 1.4.4 distribution",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["mbsum_bucky_manual", "mbsum_bucky_repository"],
+  "capabilities": [{"id": "posterior_tree_summary", "description": "Summarizes MrBayes posterior tree files for BUCKy."}],
+  "input_contracts": [{"artifact": "posterior_tree_samples", "format": "MrBayes tree files"}],
+  "output_contracts": [{"artifact": "bucky_locus_summary", "file_pattern": "*.sum"}],
+  "cli_contract": {"executable_family": ["mbsum"], "documented_core_options": {"-n": "number of initial trees to skip", "-o": "output summary file"}},
+  "limitations": ["MBSUM is documented as part of BUCKy, so its source manual is shared rather than duplicated.", "Human review is required before promotion."]
+}

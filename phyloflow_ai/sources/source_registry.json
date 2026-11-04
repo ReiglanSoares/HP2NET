@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "purpose": "Registry of project-independent scientific sources used to propose and review PhyloFlowAI knowledge contracts.",
+  "source_policy": {
+    "preferred_order": [
+      "official_manual",
+      "official_repository",
+      "primary_research_article",
+      "official_website"
+    ],
+    "require_version_when_available": true,
+    "require_human_review_before_promotion": true,
+    "allow_unverified_ai_claims_in_official_knowledge": false
+  },
+  "tools": {
+    "raxml": {
+      "display_name": "RAxML",
+      "aliases": ["RAxML", "standard-RAxML", "raxmlHPC"],
+      "manual_directory": "manuals/raxml",
+      "status": "candidate_extracted",
+      "sources": [
+        {
+          "id": "raxml_v8_2x_official_manual",
+          "type": "official_manual",
+          "title": "The RAxML v8.2.X Manual",
+          "version": "8.2.x",
+          "authors": ["Alexandros Stamatakis"],
+          "published_at": "2016-07-20",
+          "local_path": "manuals/raxml/raxml_v8.2.x_manual.pdf",
+          "official_url": "https://cme.h-its.org/exelixis/resource/download/NewManual.pdf",
+          "retrieved_at": "2026-11-01",
+          "sha256": "f276c5d786488d0de0f0e6e882f1d6a6a9286a4703f3a891713bcba6e42fa86c",
+          "review_status": "source_verified"
+        },
+        {
+          "id": "raxml_standard_official_repository",
+          "type": "official_repository",
+          "title": "standard-RAxML",
+          "version": "8.x",
+          "local_path": null,
+          "official_url": "https://github.com/stamatak/standard-RAxML",
+          "retrieved_at": "2026-11-01",
+          "sha256": null,
+          "review_status": "source_verified"
+        },
+        {
+          "id": "raxml_v8_primary_article",
+          "type": "primary_research_article",
+          "title": "RAxML version 8: a tool for phylogenetic analysis and post-analysis of large phylogenies",
+          "version": "8",
+          "authors": ["Alexandros Stamatakis"],
+          "published_at": "2014-01-21",
+          "doi": "10.1093/bioinformatics/btu033",
+          "local_path": null,
+          "official_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3998144/",
+          "retrieved_at": "2026-11-01",
+          "sha256": null,
+          "review_status": "source_verified"
+        },
+        {
+          "id": "raxml_exelixis_official_page",
+          "type": "official_website",
+          "title": "RAxML - The Exelixis Lab",
+          "version": "8.x",
+          "local_path": null,
+          "official_url": "https://cme.h-its.org/exelixis/web/software/raxml/index.html",
+          "retrieved_at": "2026-11-01",
+          "sha256": null,
+          "review_status": "source_verified"
+        }
+      ]
+    },
+    "iqtree": {
+      "display_name": "IQ-TREE",
+      "aliases": ["IQ-TREE", "IQ-TREE 2", "iqtree2"],
+      "manual_directory": "manuals/iqtree",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "iqtree_official_docs", "type": "official_manual", "title": "IQ-TREE Documentation", "version": "2.x", "local_path": null, "official_url": "https://www.iqtree.org/doc/", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified_remote_only"},
+        {"id": "iqtree2_official_repository", "type": "official_repository", "title": "IQ-TREE 2", "version": "2.x", "local_path": null, "official_url": "https://github.com/iqtree/iqtree2", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"},
+        {"id": "iqtree2_primary_article", "type": "primary_research_article", "title": "IQ-TREE 2: New Models and Efficient Methods for Phylogenetic Inference in the Genomic Era", "version": "2", "doi": "10.1093/molbev/msaa015", "local_path": null, "official_url": "https://doi.org/10.1093/molbev/msaa015", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "astral": {
+      "display_name": "ASTRAL",
+      "aliases": ["ASTRAL"],
+      "manual_directory": "manuals/astral",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "astral_official_tutorial", "type": "official_manual", "title": "ASTRAL Tutorial", "version": "5.x", "local_path": "manuals/astral/astral_official_tutorial.md", "official_url": "https://github.com/smirarab/ASTRAL/blob/master/astral-tutorial.md", "retrieved_at": "2026-11-01", "sha256": "6607b453100f494c16f8081d6b715b10460e4bca44e0fc61834c933ab40b3adb", "review_status": "source_verified"},
+        {"id": "astral_official_repository", "type": "official_repository", "title": "ASTRAL", "version": "5.x", "local_path": null, "official_url": "https://github.com/smirarab/ASTRAL", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"},
+        {"id": "astral_primary_article", "type": "primary_research_article", "title": "ASTRAL: genome-scale coalescent-based species tree estimation", "doi": "10.1093/bioinformatics/btu462", "local_path": null, "official_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4147915/", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "mrbayes": {
+      "display_name": "MrBayes",
+      "aliases": ["MrBayes", "Mr Bayes"],
+      "manual_directory": "manuals/mrbayes",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "mrbayes_v3_2_manual", "type": "official_manual", "title": "Manual of MrBayes Version 3.2", "version": "3.2", "local_path": "manuals/mrbayes/mrbayes_v3.2_manual.pdf", "official_url": "https://raw.githubusercontent.com/NBISweden/MrBayes/develop/doc/manual/Manual_MrBayes_v3.2.pdf", "retrieved_at": "2026-11-01", "sha256": "d27504ae5ac70cfe2d2ee5d5ae1e41109151cc690d89fc6f654c099fe3be409c", "review_status": "source_verified"},
+        {"id": "mrbayes_official_repository", "type": "official_repository", "title": "MrBayes", "version": "3.2.x", "local_path": null, "official_url": "https://github.com/NBISweden/MrBayes", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"},
+        {"id": "mrbayes_primary_article", "type": "primary_research_article", "title": "MRBAYES: Bayesian inference of phylogenetic trees", "doi": "10.1093/bioinformatics/17.8.754", "local_path": null, "official_url": "https://doi.org/10.1093/bioinformatics/17.8.754", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "mbsum": {
+      "display_name": "MBSUM",
+      "aliases": ["MBSUM", "mbsum"],
+      "manual_directory": "manuals/mbsum",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "mbsum_bucky_manual", "type": "official_manual", "title": "BUCKy 1.4.4 Manual (MBSUM section)", "version": "1.4.4", "local_path": "manuals/bucky/bucky_v1.4.4_manual.pdf", "official_url": "https://pages.stat.wisc.edu/~ane/bucky/v1.4/bucky_manual1.4.4.pdf", "retrieved_at": "2026-11-01", "sha256": "668b8db074dbf1e553377134cca39c84c441d418f6fb292e75b6563f49ef438a", "review_status": "source_verified"},
+        {"id": "mbsum_bucky_repository", "type": "official_repository", "title": "BUCKy source distribution including MBSUM", "version": "1.4.x", "local_path": null, "official_url": "https://github.com/cecileane/BUCKy", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "bucky": {
+      "display_name": "BUCKy",
+      "aliases": ["BUCKy"],
+      "manual_directory": "manuals/bucky",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "bucky_v1_4_4_manual", "type": "official_manual", "title": "BUCKy 1.4.4 Manual", "version": "1.4.4", "local_path": "manuals/bucky/bucky_v1.4.4_manual.pdf", "official_url": "https://pages.stat.wisc.edu/~ane/bucky/v1.4/bucky_manual1.4.4.pdf", "retrieved_at": "2026-11-01", "sha256": "668b8db074dbf1e553377134cca39c84c441d418f6fb292e75b6563f49ef438a", "review_status": "source_verified"},
+        {"id": "bucky_official_repository", "type": "official_repository", "title": "BUCKy", "version": "1.4.x", "local_path": null, "official_url": "https://github.com/cecileane/BUCKy", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"},
+        {"id": "bucky_primary_article", "type": "primary_research_article", "title": "BUCKy: gene tree/species tree reconciliation with Bayesian concordance analysis", "doi": "10.1093/bioinformatics/btq539", "local_path": null, "official_url": "https://doi.org/10.1093/bioinformatics/btq539", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "quartet_maxcut": {
+      "display_name": "Quartet MaxCut",
+      "aliases": ["Quartet MaxCut", "QMC"],
+      "manual_directory": "manuals/quartet_maxcut",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "wqmc_readme", "type": "software_manual", "title": "Weighted Quartet MaxCut ReadMe", "version": "2.x", "local_path": "manuals/quartet_maxcut/wqmc_readme.pdf", "official_url": "https://vcru.wisc.edu/simonlab/bioinformatics/programs/wqmc/ReadME.pdf", "retrieved_at": "2026-11-01", "sha256": "7e53e522c5f59e991340c57cb2cef783f35c20db14da3f17cc20f47f3dbbd5ef", "review_status": "source_verified"},
+        {"id": "qmc_primary_article", "type": "primary_research_article", "title": "A practical approximation algorithm for solving massive instances of the maximum quartet consistency problem", "doi": "10.1016/j.ympev.2011.06.021", "local_path": null, "official_url": "https://pubmed.ncbi.nlm.nih.gov/21762785/", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "snaq": {
+      "display_name": "SNaQ",
+      "aliases": ["SNaQ"],
+      "manual_directory": "manuals/snaq",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "snaq_official_readme", "type": "official_manual", "title": "SNaQ Official README", "version": "current", "local_path": "manuals/snaq/snaq_official_readme.md", "official_url": "https://github.com/JuliaPhylo/SNaQ.jl/blob/main/README.md", "retrieved_at": "2026-11-01", "sha256": "a4bb7f2f4f774fde9d81b0ee4a8e58e7aa9e61d3bc972da34e3327d65f39c641", "review_status": "source_verified"},
+        {"id": "snaq_official_documentation", "type": "official_manual", "title": "SNaQ.jl Documentation", "version": "current", "local_path": null, "official_url": "https://juliaphylo.github.io/SNaQ.jl/dev/", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified_remote_only"},
+        {"id": "snaq_official_repository", "type": "official_repository", "title": "SNaQ.jl", "version": "current", "local_path": null, "official_url": "https://github.com/JuliaPhylo/SNaQ.jl", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"},
+        {"id": "snaq_primary_article", "type": "primary_research_article", "title": "Inferring phylogenetic networks with maximum pseudolikelihood under incomplete lineage sorting", "doi": "10.1371/journal.pgen.1005896", "local_path": null, "official_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4780787/", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    },
+    "phylonet": {
+      "display_name": "PhyloNet",
+      "aliases": ["PhyloNet", "Phylo Net"],
+      "manual_directory": "manuals/phylonet",
+      "status": "candidate_extracted",
+      "sources": [
+        {"id": "phylonet_command_reference", "type": "official_manual", "title": "List of PhyloNet Commands", "version": "current", "local_path": null, "official_url": "https://wiki.rice.edu/confluence/display/PHYLONET/List+of+PhyloNet+Commands", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified_remote_only"},
+        {"id": "phylonet_official_repository", "type": "official_repository", "title": "PhyloNet", "version": "3.x", "local_path": null, "official_url": "https://github.com/NakhlehLab/PhyloNet", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"},
+        {"id": "phylonet_practical_article", "type": "primary_research_article", "title": "Practical aspects of phylogenetic network analysis using PhyloNet", "local_path": null, "official_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6005058/", "retrieved_at": "2026-11-01", "sha256": null, "review_status": "source_verified"}
+      ]
+    }
+  }
+}
+

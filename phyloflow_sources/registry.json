@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "User-managed scientific document library for PhyloFlowAI.",
+  "policy": {
+    "default_review_status": "unreviewed",
+    "automatic_promotion": false
+  },
+  "tools": {},
+  "shared_sources": []
+}

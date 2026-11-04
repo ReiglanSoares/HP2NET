@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "tool_id": "phylonet",
+  "display_name": "PhyloNet",
+  "version_scope": "3.x",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["phylonet_command_reference", "phylonet_official_repository", "phylonet_practical_article"],
+  "capabilities": [
+    {"id": "phylogenetic_network_inference", "description": "Provides multiple commands for inferring phylogenetic networks using parsimony, likelihood and pseudolikelihood criteria."},
+    {"id": "species_tree_inference", "description": "Provides commands for species-tree inference from gene trees or sequence data under supported models."},
+    {"id": "network_and_tree_analysis", "description": "Provides commands for simulation, topology manipulation, scoring and comparison of phylogenetic trees and networks."}
+  ],
+  "input_contracts": [
+    {"artifact": "phylonet_nexus_script", "format": "NEXUS containing data declarations and a PHYLONET command block"},
+    {"artifact": "phylogenetic_trees_or_networks", "format": "Extended Newick declarations when required by the selected command"},
+    {"artifact": "sequence_or_allele_data", "required": false, "description": "Accepted by commands that operate directly on these data types."}
+  ],
+  "output_contracts": [
+    {"artifact": "command_dependent_result", "format": "PhyloNet textual output, trees, networks, scores or simulated data depending on the selected command"}
+  ],
+  "cli_contract": {
+    "executable_family": ["java -jar PhyloNet*.jar"],
+    "command_families": ["network inference", "species-tree inference", "simulation", "comparison and scoring", "data and topology utilities"],
+    "example_network_inference_commands": ["InferNetwork_MP", "InferNetwork_ML", "InferNetwork_MPL"]
+  },
+  "limitations": ["Outputs and required inputs are command-specific and must be resolved from the complete command reference.", "This initial extraction is a high-level index and does not yet encode every PhyloNet command.", "The remote command-reference PDF could not be stored locally; source URLs remain registered.", "Human review is required before promotion."]
+}

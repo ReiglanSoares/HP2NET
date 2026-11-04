@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phyloflow.ai/schemas/source-manifest-v1.json",
+  "title": "PhyloFlowAI source index manifest",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "source_profile", "registry_sha256", "entries"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "generated_at": {"type": "string"},
+    "source_profile": {"type": "string", "enum": ["official", "user_only", "combined"]},
+    "registry_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "entries": {"type": "array"}
+  }
+}

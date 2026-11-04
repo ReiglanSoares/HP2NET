@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "iqtree",
+  "display_name": "IQ-TREE",
+  "version_scope": "2.x",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["iqtree_official_docs", "iqtree2_official_repository", "iqtree2_primary_article"],
+  "capabilities": [{"id": "maximum_likelihood_tree_inference", "description": "Infers maximum-likelihood phylogenetic trees from sequence alignments."}],
+  "input_contracts": [{"artifact": "sequence_alignment", "formats": ["PHYLIP", "FASTA", "NEXUS and other documented alignment formats"], "cli_option": "-s"}],
+  "output_contracts": [{"artifact": "maximum_likelihood_tree", "file_pattern": "<prefix>.treefile", "format": "Newick"}, {"artifact": "run_report", "file_pattern": "<prefix>.iqtree"}],
+  "cli_contract": {"executable_family": ["iqtree2", "iqtree"], "documented_core_options": {"-s": "alignment input", "-m": "model selection or model", "-T": "thread control"}},
+  "limitations": ["Exact outputs depend on the selected analysis mode and options.", "This initial extraction does not yet cover every model, test and analysis mode documented by IQ-TREE.", "The remote documentation PDF could not be stored locally; source URLs remain registered.", "Human review is required before promotion."]
+}

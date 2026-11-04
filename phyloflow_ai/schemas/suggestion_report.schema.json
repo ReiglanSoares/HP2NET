@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phyloflow.ai/schemas/suggestion-report-v1.json",
+  "title": "PhyloFlowAI knowledge suggestion report",
+  "type": "object",
+  "required": ["schema_version", "adapter", "policy", "selection", "diagnostics", "suggestions", "candidate_knowledge_patch"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "adapter": {"type": "string"},
+    "policy": {"type": "string"},
+    "selection": {
+      "type": "object",
+      "required": ["source_profile", "tools", "keywords", "source_index"]
+    },
+    "diagnostics": {"type": "array"},
+    "suggestions": {"type": "array"},
+    "candidate_knowledge_patch": {"$ref": "candidate_patch.schema.json"}
+  }
+}

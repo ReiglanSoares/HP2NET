@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "tool_id": "quartet_maxcut",
+  "display_name": "Quartet MaxCut",
+  "version_scope": "Weighted Quartet MaxCut 2.x",
+  "status": "candidate_unreviewed",
+  "generated_from_sources": ["wqmc_readme", "qmc_primary_article"],
+  "capabilities": [{"id": "quartet_tree_assembly", "description": "Constructs a phylogenetic tree that approximates compatibility with an input collection of quartets."}],
+  "input_contracts": [{"artifact": "quartet_collection", "format": "quartet records, optionally weighted", "cli_option": "qrtt"}],
+  "output_contracts": [{"artifact": "assembled_phylogenetic_tree", "format": "Newick", "cli_option": "otre"}],
+  "cli_contract": {"executable_family": ["max-cut-tree"], "documented_core_options": {"qrtt": "quartet input", "otre": "output tree", "weights": "whether input quartets carry weights"}},
+  "limitations": ["The available implementation guide is registered as software_manual, not asserted to be the original project repository.", "The initial extraction does not yet cover every weighted and unweighted execution mode.", "Human review is required before promotion."]
+}
