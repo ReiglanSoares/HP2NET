@@ -47,6 +47,7 @@ from .adapters.hp2net.patterns import (
     resolve_implementation_pattern,
 )
 from .adapters.hp2net import ADAPTER
+from .adapters.hp2net.renderer import RenderError, render_workflow
 from .engine.output import (
     create_preview_workspace,
     load_preview_workspace,
@@ -66,17 +67,16 @@ from .engine.validation import (
     extract_python_code,
     validate_generated_code,
     validate_workflow_names,
+    strip_decorators,
 )
 TEST_KB_PATH = TARGET_KB_PATH
 warnings.filterwarnings("ignore", category=SyntaxWarning)
-
 
 def _print_validation_checks(checks):
     print("Code Validation:")
     for check_name, check_status in checks.items():
         print(f"  {check_name}: {check_status}")
     print()
-
 
 def _create_preview(
     generated_code,
@@ -106,7 +106,6 @@ def _create_preview(
     print(f"  Diff: {diff_path}")
     print(f"  Metadata: {metadata_path}")
     print("  Original workflow: unchanged")
-
 
 def _load_generated_workflow(code_path):
     project_path = Path.cwd().resolve()
@@ -143,7 +142,6 @@ def _load_generated_workflow(code_path):
     }
     return display_path, generated_code, validated_plan
 
-
 def integrate_saved_workflow(code_path, workspace, target_knowledge):
     generated_path, generated_code, validated_plan = _load_generated_workflow(code_path)
     pattern = resolve_implementation_pattern(validated_plan["steps"])
@@ -170,7 +168,6 @@ def integrate_saved_workflow(code_path, workspace, target_knowledge):
         pattern=pattern,
         generated_source=generated_path,
     )
-
 
 def _open_preview_workspace(preview_name, new_preview_name, preview_source):
     try:
@@ -315,38 +312,75 @@ def main(
     else:
         print("[2.5/3] No static pattern found; building dynamic execution specification.\n")
         pattern = build_dynamic_pattern(proposed_steps, target_knowledge)
-    print("[3/3] Running Agent 2 (Parsl Code Generator with self-correction)...")
+
+
     max_attempts = 3
     generated_code = None
     all_passed = False
     checks = {}
     error_message = ""
-    for attempt in range(1, max_attempts + 1):
-        print(f"      -> Attempt {attempt} of {max_attempts}...")
-        spec = IMPLEMENTATION_SPEC
-        if attempt > 1 and error_message:
-            spec = dict(IMPLEMENTATION_SPEC)
-            spec["rules"] = list(IMPLEMENTATION_SPEC["rules"]) + [
-                "PREVIOUS CODE FAILED VALIDATION: " + error_message +
-                " Regenerate the complete function and fix exactly these problems."
-            ]
-        generated_code = run_agent2_test_generator(
-            validated_plan,
-            pattern,
-            spec,
-            load_apps_context()
+
+    try:
+        generated_code = render_workflow(
+            proposed_steps,
+            target_knowledge,
+            validated_plan["workflow_name"]
         )
+    except RenderError as error:
+        print(f"[3/3] Template rendering unavailable ({error}); falling back to the LLM.")
+
+    if generated_code:
         all_passed, checks, error_message = validate_generated_code(
             generated_code,
             proposed_steps,
             pattern,
             knowledge=target_knowledge
         )
-        if all_passed:
-            print("      -> Code validation passed successfully!")
-            break
-        print(f"      -> Validation failed on attempt {attempt}: {error_message}")
-        print(generated_code)
+
+        if not all_passed:
+            print("[ERROR] Deterministic rendering failed validation.")
+            print(f"      -> {error_message}")
+            print(generated_code)
+            return
+        print("[3/3] Code rendered deterministically from the knowledge base.")
+    else:
+        print("[3/3] Running Agent 2 (Parsl Code Generator with self-correction)...")
+
+        for attempt in range(1, max_attempts + 1):
+            print(f"      -> Attempt {attempt} of {max_attempts}...")
+            spec = IMPLEMENTATION_SPEC
+
+            if attempt > 1 and error_message:
+                spec = dict(IMPLEMENTATION_SPEC)
+                spec["rules"] = list(IMPLEMENTATION_SPEC["rules"]) + [
+                    "PREVIOUS CODE FAILED VALIDATION: " + error_message
+                    + "\nPREVIOUS CODE:\n" + generated_code
+                    + "\nReturn the complete corrected function. Change only what is needed "
+                    "to fix these problems and keep everything else identical."
+                ]
+
+            generated_code = run_agent2_test_generator(
+                validated_plan,
+                pattern,
+                spec,
+                load_apps_context()
+            )
+
+            generated_code = strip_decorators(generated_code)
+
+            all_passed, checks, error_message = validate_generated_code(
+                generated_code,
+                proposed_steps,
+                pattern,
+                knowledge=target_knowledge
+            )
+
+            if all_passed:
+                print("      -> Code validation passed successfully!")
+                break
+
+            print(f"      -> Validation failed on attempt {attempt}: {error_message}")
+            print(generated_code)
     print("\nCode Validation Results:")
     for check_name, check_status in checks.items():
         print(f"  {check_name}: {check_status}")

@@ -21,6 +21,21 @@ IMPLEMENTATION_SPEC = {
         "Do not add tools before, after, or between the validated steps unless required by the implementation pattern.",
         "Ensure function calls respect the exact signature contracts (required arguments and input types) defined in apps.py.",
         "Do not invent configuration attributes or file paths. Use only configuration fields present in bioconfig.py and filesystem paths established by the implementation pattern.",
-        "Do not emit optional arguments merely because they exist in the app signature. Emit an argument only when the implementation pattern requires it or when the original HP2Net workflow uses it."
-    ]
+        "Do not emit optional arguments merely because they exist in the app signature. Emit an argument only when the implementation pattern requires it or when the original HP2Net workflow uses it.",
+        "The function signature must be exactly (config, basedir, prepare_to_run).",
+        "The function must return a list of futures."
+    ],
+    "few_shot_example": '''
+EXPECTED SHAPE OF THE OUTPUT (structure only, follow the numbered steps for the real content):
+
+def <function_name>(config, basedir, prepare_to_run):
+    ...
+    return [<final_future>]
+'''
+    "ret_raxml = []"
+    "for input_file in glob.glob(os.path.join(basedir['dir'], 'input', 'phylip', '*.phy')):"
+    "ret_raxml.append(apps.raxml(basedir=basedir, config=config, inputs=prepare_to_run, input_file=input_file))"
+    "ret_tree = apps.setup_tree_output(basedir=basedir, config=config, inputs=ret_raxml)"
+    "ret_ast = apps.astral(basedir=basedir, config=config, inputs=[ret_tree])"
+    "return [ret_ast]"
 }

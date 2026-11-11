@@ -53,6 +53,108 @@ def collect_app_calls(tree):
     visit(tree, 0)
     return sorted(calls)
 
+def _glob_directory(call):
+    if not (
+        isinstance(call.func, ast.Attribute)
+        and call.func.attr == "glob"
+        and isinstance(call.func.value, ast.Name)
+        and call.func.value.id == "glob"
+    ):
+        return None
+    parts = [
+        node.value for node in ast.walk(call)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value != "dir"
+    ]
+    segments = "/".join(parts).split("/")
+    if len(segments) < 2:
+        return None
+    return "/".join(segments[:-1]).strip("/")
+
+
+def _is_apps_call(node):
+    return (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and isinstance(node.func.value, ast.Name)
+        and node.func.value.id == "apps"
+    )
+
+
+def validate_glob_directories(tree, knowledge):
+    errors = []
+    knowledge = knowledge or {}
+    artifacts = knowledge.get("artifacts", {})
+    app_specs = knowledge.get("apps", {})
+    initial = set(knowledge.get("initial_artifacts", []))
+    known = {
+        spec["directory"].strip("/")
+        for spec in artifacts.values()
+        if spec.get("directory") and " " not in spec["directory"]
+    }
+
+    assigned = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
+            directory = _glob_directory(node.value)
+            if directory is None:
+                continue
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    assigned[target.id] = directory
+            if directory not in known:
+                errors.append(
+                    f"glob directory '{directory}/' matches no artifact directory in the knowledge base."
+                )
+
+    bound = set()
+    for loop in ast.walk(tree):
+        if not isinstance(loop, ast.For):
+            continue
+        if isinstance(loop.target, ast.Name):
+            for inner in ast.walk(loop):
+                if isinstance(inner, ast.Call):
+                    bound.add((id(inner), loop.target.id))
+        iterator = loop.iter
+        if isinstance(iterator, ast.Call):
+            directory = _glob_directory(iterator)
+        elif isinstance(iterator, ast.Name):
+            directory = assigned.get(iterator.id)
+        else:
+            directory = None
+        if directory is None:
+            continue
+        if directory not in known:
+            errors.append(
+                f"glob directory '{directory}/' matches no artifact directory in the knowledge base."
+            )
+        for inner in ast.walk(loop):
+            if not _is_apps_call(inner):
+                continue
+            for requirement in app_specs.get(inner.func.attr, {}).get("requires", []):
+                options = requirement if isinstance(requirement, list) else [requirement]
+                for option in options:
+                    expected = artifacts.get(option, {}).get("directory", "").strip("/")
+                    if option in initial and expected and expected != directory:
+                        errors.append(
+                            f"apps.{inner.func.attr} requires '{option}' in '{expected}/', "
+                            f"but the loop reads '{directory}/'."
+                        )
+
+    for call in ast.walk(tree):
+        if not _is_apps_call(call):
+            continue
+        for keyword in call.keywords:
+            if (
+                keyword.arg == "input_file"
+                and isinstance(keyword.value, ast.Name)
+                and keyword.value.id == "input_file"
+                and (id(call), "input_file") not in bound
+            ):
+                errors.append(
+                    f"apps.{call.func.attr} uses 'input_file' outside the loop that defines it."
+                )
+    return errors
+
 def validate_call_structure(tree, pattern, knowledge):
     errors = []
     calls = collect_app_calls(tree)
@@ -179,6 +281,20 @@ def validate_generated_code(code_str, expected_steps, pattern=None, apps_file="a
     if dry_error:
         errors.append(dry_error)
     return all(status == "PASSED" for status in checks.values()), checks, " ".join(errors)
+
+def strip_decorators(code_str):
+    if not isinstance(code_str, str) or not code_str.strip():
+        return code_str
+    try:
+        tree = ast.parse(code_str)
+    except SyntaxError:
+        return code_str
+    changed = False
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.decorator_list:
+            node.decorator_list = []
+            changed = True
+    return ast.unparse(tree) if changed else code_str
 
 def extract_python_code(content):
     if "```python" in content:

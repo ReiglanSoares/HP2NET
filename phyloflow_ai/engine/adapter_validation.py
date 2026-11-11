@@ -7,9 +7,7 @@ from pathlib import Path
 
 from .graph import simulate_tool_chain
 
-
 ALLOWED_CARDINALITIES = {"once", "per_gene", "per_prune_file", "per_hmax"}
-
 
 def _result(section, name, status, message=""):
     return {
@@ -18,7 +16,6 @@ def _result(section, name, status, message=""):
         "status": status,
         "message": message,
     }
-
 
 def _parse_python(path, section, name, results):
     if not path.is_file():
@@ -31,7 +28,6 @@ def _parse_python(path, section, name, results):
         return None
     results.append(_result(section, name, "PASSED", str(path)))
     return tree
-
 
 def _read_json(path, section, name, results):
     if not path.is_file():
@@ -48,7 +44,6 @@ def _read_json(path, section, name, results):
     results.append(_result(section, name, "PASSED", str(path)))
     return content
 
-
 def _function_signatures(tree):
     signatures = {}
     if tree is None:
@@ -58,7 +53,6 @@ def _function_signatures(tree):
             required = len(node.args.args) - len(node.args.defaults)
             signatures[node.name] = [argument.arg for argument in node.args.args[:required]]
     return signatures
-
 
 def _config_names(tree):
     names = set()
@@ -78,10 +72,8 @@ def _config_names(tree):
                     names.add(target.attr)
     return names
 
-
 def _requirement_options(requirement):
     return requirement if isinstance(requirement, list) else [requirement]
-
 
 def validate_adapter(adapter, patterns, project_root="."):
     project_path = Path(project_root).resolve()
@@ -154,7 +146,6 @@ def validate_adapter(adapter, patterns, project_root="."):
             results.append(_result(
                 "Call hints", app_name, "FAILED", "Missing " + ", ".join(missing_placeholders)
             ))
-
     if not any(result["section"] == "Apps" and result["status"] == "FAILED" for result in results):
         results.append(_result("Apps", "Declared app symbols", "PASSED", f"{len(apps)} checked"))
     if not any(result["section"] == "Artifacts" and result["status"] == "FAILED" for result in results):
@@ -163,7 +154,6 @@ def validate_adapter(adapter, patterns, project_root="."):
         results.append(_result("Cardinality", "Values", "PASSED"))
     if not any(result["section"] == "Call hints" and result["status"] == "FAILED" for result in results):
         results.append(_result("Call hints", "Placeholders", "PASSED"))
-
     for tool_name, specification in tools.items():
         mapped_apps = specification.get("apps", [])
         unknown = [name for name in mapped_apps if name not in apps]
@@ -172,7 +162,6 @@ def validate_adapter(adapter, patterns, project_root="."):
             results.append(_result("Tools", tool_name, "FAILED", message))
     if not any(result["section"] == "Tools" and result["status"] == "FAILED" for result in results):
         results.append(_result("Tools", "Mappings", "PASSED", f"{len(tools)} checked"))
-
     sequence_owners = defaultdict(list)
     config_references = set()
     for steps, pattern in patterns.items():
@@ -182,6 +171,12 @@ def validate_adapter(adapter, patterns, project_root="."):
         unknown_tools = [tool for tool in steps if tool not in tools]
         unknown_apps = [app for app in pattern_apps if app not in apps or app not in app_signatures]
         error, _ = simulate_tool_chain(list(steps), knowledge) if not unknown_tools else (None, None)
+        expected_apps = []
+        for tool in steps:
+            for app in tools.get(tool, {}).get("apps", []):
+                if app not in expected_apps:
+                    expected_apps.append(app)
+        derived_mismatch = not unknown_tools and expected_apps != list(pattern_apps)
         messages = []
         if unknown_tools:
             messages.append("Unknown tools: " + ", ".join(unknown_tools))
@@ -189,11 +184,14 @@ def validate_adapter(adapter, patterns, project_root="."):
             messages.append("Unknown apps: " + ", ".join(unknown_apps))
         if error:
             messages.append(error)
+        if derived_mismatch:
+            messages.append(
+                "Derived app sequence does not match pattern. Expected: " + ", ".join(expected_apps)
+            )
         status = "FAILED" if messages else "PASSED"
         results.append(_result("Patterns", label, status, " ".join(messages)))
         text = pattern.get("description", "")
         config_references.update(re.findall(r"\bconfig\.([A-Za-z_]\w*)", text))
-
     duplicates = [owners for owners in sequence_owners.values() if len(owners) > 1]
     results.append(_result(
         "Patterns",
@@ -201,7 +199,6 @@ def validate_adapter(adapter, patterns, project_root="."):
         "WARNING" if duplicates else "PASSED",
         "; ".join(" | ".join(owners) for owners in duplicates),
     ))
-
     for specification in apps.values():
         config_references.update(
             re.findall(r"\bconfig\.([A-Za-z_]\w*)", specification.get("call_hint", ""))
@@ -214,7 +211,6 @@ def validate_adapter(adapter, patterns, project_root="."):
         "Missing: " + ", ".join(missing_config) if missing_config else f"{len(config_references)} checked",
     ))
     return results
-
 
 def print_adapter_report(adapter_name, results):
     print(f"PhyloFlowAI Adapter Validation: {adapter_name}")
